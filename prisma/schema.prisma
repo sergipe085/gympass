@@ -13,8 +13,56 @@ datasource db {
 model User {
   id String @id @default(cuid())
 
-  nome  String
-  email String @unique
+  name          String
+  email         String   @unique
+  password_hash String
+  created_at    DateTime @default(now())
+  orders        Order[]
 
   @@map("users")
+}
+
+model Order {
+  id           String    @id @default(uuid())
+  created_at   DateTime  @default(now())
+  confirmed_at DateTime?
+  shipped_at   DateTime?
+  delivered_at DateTime?
+  total_price  Decimal
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  store    Store  @relation(fields: [store_id], references: [id])
+  store_id String
+
+  products Product[]
+
+  @@map("orders")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  created_at  DateTime @default(now())
+  title       String
+  description String
+  price       Decimal
+
+  store    Store  @relation(fields: [store_id], references: [id])
+  store_id String
+
+  orders Order[]
+}
+
+model Store {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  phone       String?
+  latitude    Decimal
+  longitude   Decimal
+  orders      Order[]
+  products    Product[]
+
+  @@map("stores")
 }
